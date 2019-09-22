@@ -15,6 +15,19 @@ do Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 let notes = ReleaseNotes.load "RELEASE_NOTES.md"
 
+
+Target.create "GenerateDocs" (fun _ ->
+    let path = Path.Combine(__SOURCE_DIRECTORY__, "packages/build/FSharp.Compiler.Tools/tools/fsi.exe")
+    let workingDir = "docs/tools"
+    let args = "--define:RELEASE generate.fsx"
+    let command, args = 
+        if false then "mono", sprintf "'%s' %s" path args 
+        else path, args
+
+    if Shell.Exec(command, args, workingDir) <> 0 then
+        failwith "failed to generate docs"
+)
+
 Target.create "Clean" (fun _ ->
     if Directory.Exists "bin/Debug" then
         Trace.trace "deleting bin/Debug"
